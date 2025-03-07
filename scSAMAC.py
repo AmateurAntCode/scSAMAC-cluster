@@ -278,6 +278,11 @@ class scSAMAC(nn.Module):
         kldloss = kld(p, q)
         return self.gamma*kldloss
 
+    def cluster_level(self, data, n_cluster):
+        trans = nn.Linear(data.shape[1], n_cluster).to(self.device)
+        y = trans(data)
+        return y
+
 
     def unsupervised_contrastive_loss(self, matrix1, matrix2, margin=1.0):
 
@@ -499,13 +504,5 @@ class scSAMAC(nn.Module):
             print("Epoch %3d: Total: %.8f Clustering Loss: %.8f NB Loss: %.8f" % (
                 epoch + 1, train_loss / num, cluster_loss_val / num, recon_loss_val / num))
             train_losses.append(train_loss / num)
-            plt.figure()
-            plt.plot(range(epoch + 1), train_losses, 'b', label='Train Loss')
-            #plt.title('Training Loss of cite')
-            plt.xlabel('Epochs')
-            plt.ylabel('Total loss')
-            plt.legend()
-            plt.savefig('train_loss_curve.png')  # 保存损失曲线图像
-            plt.close()
         return self.y_pred, final_acc, final_nmi, final_ari, final_epoch
 

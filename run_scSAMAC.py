@@ -8,7 +8,7 @@ from torch.nn import Parameter
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
-
+from openTSNE import TSNE
 from scSAMAC import scSAMAC
 from single_cell_tools import *
 import numpy as np
@@ -37,7 +37,7 @@ if __name__ == "__main__":
                         help='number of selected genes, 0 means using all genes')
     parser.add_argument('--batch_size', default=256, type=int)
 
-    parser.add_argument('--data_file', default='new_klein.h5')
+    parser.add_argument('--data_file', default='Zeisel.h5')
 
     parser.add_argument('--maxiter', default=2000, type=int)
     parser.add_argument('--pretrain_epochs', default=300, type=int)
@@ -165,3 +165,12 @@ if __name__ == "__main__":
     np.savetxt(args.final_latent_file, final_latent, delimiter=",")
     np.savetxt(args.predict_label_file, y_pred, delimiter=",", fmt="%i")
 
+    tsne_embedding = TSNE(
+        perplexity=30,
+        initialization="pca",
+        metric="euclidean",
+        n_jobs=8,
+        random_state=42,
+    )
+    latent_tsne_2 = tsne_embedding.fit(final_latent)
+    np.savetxt("tsne_2D.txt", latent_tsne_2, delimiter=",")
